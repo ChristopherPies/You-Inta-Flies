@@ -1,0 +1,49 @@
+<tr>
+	<?php 
+	if ($this->data instanceof Zend_Db_Table_Row) {
+		$data = $this->data->toArray();
+	} else {
+	    $data = $this->data;
+	}
+
+    if(is_array($this->map)) {
+
+        foreach($this->map as $key => $column) {
+            $col = $column['column'];
+
+            $class = '';
+            if(!empty($column['class'])) {
+                if($column['class'] instanceof Closure) {
+                    $eval = array_map($column['class'], array($data));
+                    $class = ' class="'.$eval[0].'"';
+                } else {
+                    $class = ' class="' . $column['class'] . '"';
+                }
+            }
+            $otherAttribs = array();
+            foreach($column as $index => $value) {
+                if(!in_array($index, array('column', 'label', 'class', 'sort'))) {
+                    $otherAttribs []= $index.'="'.$value.'"';
+                }
+            }
+
+            if ($col instanceof Closure) {
+                $eval = array_map($col, array($data));
+                echo "\t<td$class ".implode(' ', $otherAttribs).">".$eval[0] ."</td>\n";
+
+            } else {
+                $val = '';
+                if(!empty($data[$col])) {
+                    $val = $data[$col];
+                }
+                echo "\t<td$class ".implode(' ', $otherAttribs).">". $val . "</td>\n";
+            }
+
+        }
+    } else {
+    	foreach($this->data as $key => $value) {
+    		echo "\t<td>". $value . "</td>\n";
+    	}
+    }
+    ?>
+</tr>

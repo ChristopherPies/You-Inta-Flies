@@ -1,0 +1,1 @@
+[22-Aug-2012 12:55:49] PHP Fatal error:  Class 'Zend_Application_Bootstrap_Bootstrap' not found in /home/spencerd/public_html/spencerdickson.com/churchjournal/application/Bootstrap.php on line 3

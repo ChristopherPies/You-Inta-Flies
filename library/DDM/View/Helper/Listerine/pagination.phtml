@@ -1,0 +1,93 @@
+<?php
+// when using more than one list on a page, "page" can't be the name of the current page number var
+$pageVar = $this->listerine()->getPageVarName();
+
+$ajaxPagination = $this->listerine()->getAjaxPagination();
+$updateUrl = $this->listerine()->getUpdateUrl();
+$listId = $this->listerine()->getId();
+$urlOptions = array();
+if(!empty($updateUrl) && $ajaxPagination)
+{
+    if(!strstr($_SERVER['HTTP_HOST'], $updateUrl))
+    {
+        $updateUrl = 'http://'.$_SERVER['HTTP_HOST'].$updateUrl;
+    }
+    $request = new Zend_Controller_Request_Http($updateUrl);
+    Zend_Controller_Front::getInstance()->getRouter()->route($request);
+    $urlOptions = $request->getParams();
+}
+echo '<div class="pagination" data-for="'.$listId.'">';
+if ($this->pageCount > 1) {
+
+	$number = (sizeof($this->pagesInRange) > $this->pageCount) ? $this->pageCount : sizeof($this->pagesInRange);
+	$start = ($this->current - 2 < 1) ? 1 : $this->current - 2;
+	$start -= (($start + $number - 1) > $this->last) ? (($start + $number - 1) - $this->last) : 0;
+
+	$firstLink = '';
+	$lastLink = '';
+	$middleLinks = array();
+
+	// Links to reload via ajax or links to reload the whole page?
+	if($ajaxPagination) {
+		$queryParams = array();
+		// FIRST
+		$firstLink = "<li><a href=\"javascript:listerinePaginate('$pageVar','$this->first','". $this->url(array_merge($urlOptions,array($pageVar => $this->first))) ."','" . $listId . "');\">". $this->first ."</a>";
+		// MID
+		for($i = $start; $i < ($start+$number); $i++) {
+			$middleLinks[$i] = "<li class=\"".(($this->current == $i)?'active':'') . "\"><a href=\"javascript:listerinePaginate('$pageVar','$i','". $this->url(array_merge($urlOptions,array($pageVar => $i))) ."','$listId');\">$i</a></li>";
+		}
+		// LAST
+		$lastLink = "<li><a href=\"javascript:listerinePaginate('$pageVar','$this->last','". $this->url(array_merge($urlOptions,array($pageVar => $this->last))) ."','" . $listId . "');\">". $this->last ."</a>";
+
+	} else {
+
+		// maintain query string params while navigating from page to page
+		$queryParams = parse_qs($_SERVER['QUERY_STRING']);
+		$this->query = http_build_query($queryParams);
+
+		// FIRST
+		$this->query = '?' . http_build_query(array_merge($queryParams, array($pageVar => $this->first)));
+		$firstLink = '<li><a href="' . $this->url(array_merge($urlOptions,array($pageVar => $this->first))) . $this->query . '">'. $this->first .'</a></li>';
+		// MID
+		for($i = $start; $i < ($start+$number); $i++) {
+			$this->query = '?' . http_build_query(array_merge($queryParams, array($pageVar => $i)));
+			$middleLinks[$i] = '<li class="'.(($this->current == $i)?'active':'').'"><a href="'.   $this->url(array_merge($urlOptions,array($pageVar => $i))) . $this->query .'">'.$i.'</a></li>' . "\n";
+		}
+		// LAST
+		$this->query = '?' . http_build_query(array_merge($queryParams, array($pageVar => $this->last)));
+		$lastLink = '<li><a href="' . $this->url(array_merge($urlOptions,array($pageVar => $this->last))) . $this->query . '">'. $this->last .'</a></li>';
+
+		// setup query for "Prev" link
+		$this->query = '?' . http_build_query(array_merge($queryParams, array($pageVar => $this->previous)));
+
+	}
+?>
+    <ul>
+        <li class="<?php (($this->current == $this->first)?'disabled':'') ?>"><a href="<?=(($this->current == $this->first)?'#':   (($ajaxPagination) ? "javascript:listerinePaginate('$pageVar','$this->previous','" : '' ) .   $this->url(array_merge($urlOptions,array($pageVar => $this->previous))) . $this->query .  (($ajaxPagination) ? "','".$listId."');" : '' )  )?>">«</a></li>
+        <?php
+    if($start != $this->first) {
+    	if($start - 1 != $this->first) {
+            echo '<li class="disabled"><a href="#">...</a></li>';
+        }
+    }
+
+    // numbered links
+    foreach($middleLinks as $link) {
+		echo $link;
+	}
+
+    if($start + $number -1 != $this->last) {
+        if($start + $number != $this->last) {
+            echo '<li class="disabled"><a href="#">...</a></li>' . "\n";
+        }
+        echo $lastLink;
+
+        // setup query for "Next" link
+        $this->query = '?' . http_build_query(array_merge($queryParams, array($pageVar => $this->next)));
+    }
+    ?>
+        <li class="<?=(($this->current == $this->last)?'disabled':'')?>"><a href="<?=(($this->current == $this->last)?'#':    (($ajaxPagination) ? "javascript:listerinePaginate('$pageVar','$this->next','" : '') .  $this->url(array_merge($urlOptions,array($pageVar => $this->next))) . $this->query .  (($ajaxPagination) ? "','".$listId."');" : '')    )?>">»</a></li>
+    </ul>
+<?php }
+echo '</div>';
+?>

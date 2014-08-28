@@ -1,0 +1,6 @@
+<?php
+$this->headTitle(' - Error', Zend_View_Helper_Placeholder_Container_Abstract::PREPEND);
+ppr($this->exception);
+?>
+<span class="heading">An error occurred</span>
+<span class="subheading"><?php echo $this->message ?></span>

@@ -1,0 +1,32 @@
+<?php
+    if($this->showTotalsRow && !empty($this->totalsRow) && !empty($this->map))
+    {
+        echo '<tr class="'.$this->totalClass.'">';
+        foreach($this->map as $column) {
+            if(!empty($column['showTotal']) && $column['showTotal'] === true) {
+                $class = '';
+                if(!empty($column['class'])) {
+                    $class = ' class="' . $column['class'] . '"';
+                }
+                echo "<td$class>
+                        ".@$column['totalPrepend'].
+                        number_format($this->totalsRow[$column['label']],(isset($column['totalDecimals'])?$column['totalDecimals']:2)).
+                        @$column['totalAppend'].
+                     "</td>\n";
+            }
+            else if(!empty($column['totalLabel'])) {
+                echo "<td>".$column['totalLabel']."</td>";
+            }
+            else echo '<td></td>';
+        }
+        echo '</tr>';
+    }
+?>
+    </tbody>
+</table>
+
+<?php
+if(is_object($this->paginator)) {
+    echo $this->paginationControl($this->paginator);
+}
+?>

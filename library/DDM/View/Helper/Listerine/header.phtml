@@ -1,0 +1,81 @@
+<?php
+$titleExists = false;
+if($this->data && count($this->data)) {
+     foreach ($this->data as $key=>$data)
+     {
+         if((string)$key == 'title')
+         {
+             echo "<h2>$data ";
+             if($this->displayTotalResults) {
+                 echo '<small id="'.$this->id.'_total">'.$this->totalItemCount.' result'.(($this->totalItemCount==1)?'':'s').'</small>';
+             }
+             echo "</h2>";
+             $titleExists = true;
+         }
+         else
+         {
+            echo $data;
+         }
+     }
+}
+if(!$titleExists) {
+    if($this->displayTotalResults) {
+        echo '<div style="clear:both; display:inline-block; width:auto; font-weight:bold; margin-bottom:0px; margin-left:10px;" id="'.$this->id.'_total" class="lead pull-right">'.$this->totalItemCount.' result'.(($this->totalItemCount==1)?'':'s').'</div>';
+    }
+}
+?>
+
+<link rel="stylesheet" type="text/css" href="/js/lib/jQueryPlugins/__jquery.tablesorter/themes/DC/style.css" />
+<?php if($this->csvExportButton) {
+    $url = $_SERVER['REQUEST_URI'];
+    if(strstr($url, '?')) {
+        $url .= '&listerineCsv='.$this->id;
+    } else {
+        $url .= '?listerineCsv='.$this->id;
+    }
+?>
+<a class="btn pull-right" title="CSV Export" target="_blank" href="<?php echo $url; ?>"><i class="icon icon-list-alt"></i></a>
+<?php } ?>
+<?php
+if(is_object($this->paginator)) {
+    echo $this->paginationControl($this->paginator);
+}
+?>
+<table <?php if($this->id) echo 'id="'. $this->id . '" '; if($this->class) echo 'class="'.$this->class.'"'; ?>>
+<thead class="cf">
+    <tr>
+    <?php
+        // http://css-tricks.com/examples/ResponsiveTables/responsive.php
+        if(!empty($this->map)) {
+            foreach($this->map as $key => $column) {
+                $label = $column['label'];
+
+                $class = '';
+                if(!empty($column['class'])) {
+                    if($column['class'] instanceof Closure) {
+                        $eval = array_map($column['class'], array($data));
+                        $class = ' class="'.$eval[0].((empty($column['sort']))?'':' header').'"';
+                    } else {
+                        $class = ' class="' . $column['class'].((empty($column['sort']))?'':' header'). '"';
+                    }
+                }
+                $sort='';
+                if(!empty($column['sort'])) {
+                    if(empty($column['class'])) {
+                        $class = ' class="header"';
+                    }
+                    $sort = ' onclick="listerineSort(this,\''.$this->id.'\',\''.$column['sort'].'\')"';
+                }
+                echo "\t<th$class$sort>$label</th>\n";
+            }
+        } else if(is_array($this->keys)) {
+
+			foreach($this->keys as $key) {
+				echo "\t<th>$key</th>\n";
+			}
+
+		}
+    ?>
+    </tr>
+</thead>
+<tbody>

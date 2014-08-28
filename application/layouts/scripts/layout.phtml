@@ -1,0 +1,96 @@
+<?php
+$this->headScript()->prependFile('http://code.jquery.com/jquery-1.11.0.min.js');
+//$this->headScript()->prependFile('http://code.jquery.com/jquery-migrate-1.2.1.min.js');
+$this->headLink()->prependStylesheet('/css/bootstrap.css');
+$this->headTitle('You Inta Flies?', Zend_View_Helper_Placeholder_Container_Abstract::PREPEND);
+echo $this->doctype();
+?>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <?php
+        echo $this->headTitle();
+        echo $this->headMeta();
+        echo $this->headLink();
+        echo $this->headScript();
+        //navbar-static-top
+        //navbar-fixed-top
+        ?>
+    </head>
+    <body>
+<!--    <style>-->
+<!--        #navbar.affix {-->
+<!--            position: fixed;-->
+<!--            top: 0px;-->
+<!--            width: 100%;-->
+<!--        }-->
+<!--    </style>-->
+    <script type="text/javascript" src="/js/bootstrap.js"></script>
+    <div class="page-header" style="margin: 0px">
+        <h1 style="margin-left: 15px">You Inta Flies?<img src="/images/SaltLakeCity.jpg" style="float: right; height: 50px; margin-right: 15px"/></h1>
+    </div>
+    <div id="nav-wrapper">
+        <nav id="navbar" class="navbar navbar-default navbar-static-top" role="navigation">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <!--<a class="navbar-brand" href="#">You Inta Flies?</a>-->
+                </div>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="#">Search</a></li>
+                        <li><a href="#">Other</a></li>
+                        <li><a href="#">Other</a></li>
+                    </ul>
+                    <?php
+                    if(isset($_SESSION['Zend_Auth']['storage']->id) && !empty($_SESSION['Zend_Auth']['storage']->id)) {
+                        echo '
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Username Here <span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="#">Action</a></li>
+                                    <li><a href="#">Another action</a></li>
+                                    <li><a href="#">Something else here</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="/user/logout">Logout</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                        ';
+                    } else {
+                        echo '
+                        <form id="loginForm" name="loginForm" class="navbar-form navbar-right" action="user/login" method="post" style="float: right; display: block">
+                            <input type="text" id="Auth_email" name="Auth_email" placeholder="Email address"/>
+                            <input type="password" id="Auth_password" name="Auth_password" placeholder="Password"/>
+                            <input class="btn btn-sm" type="submit" value="Login"/>
+                        </form>
+                        ';
+                    }
+                    ?>
+
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+    </div>
+        <?php
+            echo $this->layout()->content;
+            echo $this->message;
+        ?>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('#navbar').affix({
+                offset: { top: $('#navbar').offset().top }
+            });
+            $('#nav-wrapper').height($("#navbar").height());
+        });
+    </script>
+    </body>
+</html>
